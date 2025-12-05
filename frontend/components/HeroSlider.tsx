@@ -198,15 +198,17 @@ const TOTAL_PARTICLES = 18;
 
 export default function HeroSliderPremium() {
   const [current, setCurrent] = useState(0);
-  const [particles, setParticles] = useState<{ top: number; left: number; dx: number; dy: number; dur: number }[]>([]);
+  const [particles, setParticles] = useState<
+    { top: number; left: number; dx: number; dy: number; dur: number }[]
+  >([]);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Generate particles relative to container
+  // Generate particles only on client
   useEffect(() => {
     const arr = Array.from({ length: TOTAL_PARTICLES }).map(() => ({
-      top: Math.random() * 100, // %
-      left: Math.random() * 100, // %
-      dx: (Math.random() - 0.5) * 20, // relative movement
+      top: Math.random() * 100,
+      left: Math.random() * 100,
+      dx: (Math.random() - 0.5) * 20,
       dy: (Math.random() - 0.5) * 20,
       dur: 3 + Math.random() * 2,
     }));
@@ -215,7 +217,7 @@ export default function HeroSliderPremium() {
 
   // Auto-slide
   useEffect(() => {
-    const t = setInterval(() => setCurrent((p) => (p + 1) % slides.length), 6000);
+    const t = setInterval(() => setCurrent((prev) => (prev + 1) % slides.length), 6000);
     return () => clearInterval(t);
   }, []);
 
@@ -228,9 +230,10 @@ export default function HeroSliderPremium() {
       const rect = el.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
-      const dx = (e.clientX - cx) / (rect.width / 2); // -1..1
-      const dy = (e.clientY - cy) / (rect.height / 2);
-      setPointer({ x: dx, y: dy });
+      setPointer({
+        x: (e.clientX - cx) / (rect.width / 2),
+        y: (e.clientY - cy) / (rect.height / 2),
+      });
     };
     window.addEventListener("mousemove", onMove);
     return () => window.removeEventListener("mousemove", onMove);
@@ -245,7 +248,9 @@ export default function HeroSliderPremium() {
         {/* Backdrop */}
         <m.div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,241,230,0.01))" }}
+          style={{
+            background: "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,241,230,0.01))",
+          }}
         />
 
         {/* Particles */}
@@ -323,12 +328,10 @@ export default function HeroSliderPremium() {
                 }}
                 transition={{ type: "spring", stiffness: 120, damping: 16 }}
               >
-                {/* Ambient glow */}
                 <m.div className="absolute inset-0 rounded-2xl pointer-events-none" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}>
                   <div style={{ position: "absolute", inset: -140, background: "radial-gradient(600px 200px at 20% 30%, rgba(255,136,61,0.06), transparent)" }} />
                 </m.div>
 
-                {/* Product image */}
                 <m.div
                   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-[85%] rounded-xl"
                   initial={{ y: 30, opacity: 0, scale: 0.98 }}
